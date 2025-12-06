@@ -2,11 +2,24 @@
 
 declare(strict_types=1);
 
-function boasVindas(string $nome): string
+// Base de Dados na memória
+$tarefas = [
+    "Aprender a sintaxe de Arrays",
+    "Configurar o VS Code para PHP",
+    "Beber água (importante!)"
+];
+
+// Função para mostrar as tarefas
+function exibirTarefas(array $lista): void
 {
-    return "Olá, $nome! O ambiente PHP 8+ está configurado e pronto.";
+    echo "--- AS TUAS TAREFAS ---\n";
+
+    foreach ($lista as $index => $tarefa) {
+        $numeroVisual = $index + 1;
+        echo "[{$numeroVisual}] - {$tarefa}\n";
+    }
+
+    echo "-----------------------\n";
 }
 
-echo "--- INICIANDO SISTEMA ---\n";
-echo boasVindas("Desenvolvedor");
-echo "\n";
+exibirTarefas($tarefas);
