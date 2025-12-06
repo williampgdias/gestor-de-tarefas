@@ -57,10 +57,44 @@ function adicionarTarefa(array $listaAtual): array
     }
 
     $listaAtual[] = $novaTarefa;
+    salvarTarefas($listaAtual);
+
+    echo "Tarefa salva com sucesso! 💾\n";
+    return $listaAtual;
+}
+
+// --- Concluir Tarefa ---
+function concluirTarefa(array $listaAtual): array
+{
+    // Mostrar a lista para o usuário saber qual número escolher
+    exibirTarefas($listaAtual);
+
+    if (count($listaAtual) === 0) {
+        return $listaAtual;
+    }
+
+    $numero = readline("Digite o número da tarefa para concluir: ");
+
+    // Converter o texto para número
+    $index = (int)$numero;
+    $indexReal = $index - 1;
+
+    if (!isset($listaAtual[$indexReal])) {
+        echo "Erro: Tarefa número $index não existe!\n";
+        return $listaAtual;
+    }
+
+    // Guardar o nome da tarefa para mostrar na mensagem
+    $tarefaRemovida = $listaAtual[$indexReal];
+
+    unset($listaAtual[$indexReal]);
+
+    // Re-organiza os índices
+    $listaAtual = array_values($listaAtual);
 
     salvarTarefas($listaAtual);
 
-    echo "Tarefa salva no disco com sucesso! 💾\n";
+    echo "Parabéns! Tarefa '$tarefaRemovida' concluída! ✅\n";
 
     return $listaAtual;
 }
@@ -74,14 +108,16 @@ while (true) {
     echo "\n--- MENU ---\n";
     echo "1. Listar Tarefas\n";
     echo "2. Adicionar Tarefa\n";
-    echo "3. Sair\n";
+    echo "3. Concluir Tarefa (Remover)\n";
+    echo "4. Sair\n";
 
     $opcao = readline("Escolha uma opção: ");
 
     match ($opcao) {
         "1" => exibirTarefas($tarefas),
         "2" => $tarefas = adicionarTarefa($tarefas),
-        "3" => die("Adeus! 👋\n"),
+        "3" => $tarefas = concluirTarefa($tarefas),
+        "4" => die("Adeus! 👋\n"),
         default => print "Opção inválida!\n"
     };
 }
