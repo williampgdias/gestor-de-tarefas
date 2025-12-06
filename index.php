@@ -51,7 +51,7 @@ function adicionarTarefa(array $listaAtual): array
     $novaTarefa = readline("Digite a nova tarefa: ");
 
     // Validação simples: Não aceitar tarefa vazia
-    if ($novaTarefa === "") {
+    if (trim($novaTarefa) === "") {
         echo "Erro: A tarefa não pode ser vazia!\n";
         return $listaAtual;
     }
@@ -60,6 +60,42 @@ function adicionarTarefa(array $listaAtual): array
     salvarTarefas($listaAtual);
 
     echo "Tarefa salva com sucesso! 💾\n";
+    return $listaAtual;
+}
+
+function editarTarefa(array $listaAtual): array
+{
+    exibirTarefas($listaAtual);
+
+    if (count($listaAtual) === 0) {
+        return $listaAtual;
+    }
+
+    $numero = readline("Digite o número da tarefa para editar: ");
+    $index = (int)$numero - 1;
+
+    if (!isset($listaAtual[$index])) {
+        echo "Erro: Tarefa não encontrada!\n";
+        return $listaAtual;
+    }
+
+    $tarefaAntiga = $listaAtual[$index];
+    echo "Tarefa atual: $tarefaAntiga\n";
+
+    $novoTexto = readline("Digite o novo texto (ou ENTER para manter): ");
+
+    // Se o usuário digitou apenas espaços ou nada, mantemos o antigo
+    if (trim($novoTexto) === "") {
+        echo "Edição cancelada (texto vazio).\n";
+        return $listaAtual;
+    }
+
+    // Atualizamos a posição específica do array
+    $listaAtual[$index] = $novoTexto;
+
+    salvarTarefas($listaAtual);
+    echo "Tarefa atualizada com sucesso! ✏️\n";
+
     return $listaAtual;
 }
 
@@ -76,25 +112,24 @@ function concluirTarefa(array $listaAtual): array
     $numero = readline("Digite o número da tarefa para concluir: ");
 
     // Converter o texto para número
-    $index = (int)$numero;
-    $indexReal = $index - 1;
+    $index = (int)$numero - 1;
 
-    if (!isset($listaAtual[$indexReal])) {
+    if (!isset($listaAtual[$index])) {
         echo "Erro: Tarefa número $index não existe!\n";
         return $listaAtual;
     }
 
     // Guardar o nome da tarefa para mostrar na mensagem
-    $tarefaRemovida = $listaAtual[$indexReal];
+    $tarefaRemovida = $listaAtual[$index];
 
-    unset($listaAtual[$indexReal]);
+    unset($listaAtual[$index]);
 
     // Re-organiza os índices
     $listaAtual = array_values($listaAtual);
 
     salvarTarefas($listaAtual);
 
-    echo "Parabéns! Tarefa '$tarefaRemovida' concluída! ✅\n";
+    echo "Tarefa '$tarefaRemovida' concluída! ✅\n";
 
     return $listaAtual;
 }
@@ -108,16 +143,18 @@ while (true) {
     echo "\n--- MENU ---\n";
     echo "1. Listar Tarefas\n";
     echo "2. Adicionar Tarefa\n";
-    echo "3. Concluir Tarefa (Remover)\n";
-    echo "4. Sair\n";
+    echo "3. Editar Tarefa\n";
+    echo "4. Concluir Tarefa (Remover)\n";
+    echo "5. Sair\n";
 
     $opcao = readline("Escolha uma opção: ");
 
     match ($opcao) {
         "1" => exibirTarefas($tarefas),
         "2" => $tarefas = adicionarTarefa($tarefas),
-        "3" => $tarefas = concluirTarefa($tarefas),
-        "4" => die("Adeus! 👋\n"),
+        "3" => $tarefas = editarTarefa($tarefas),
+        "4" => $tarefas = concluirTarefa($tarefas),
+        "5" => die("Adeus! 👋\n"),
         default => print "Opção inválida!\n"
     };
 }
