@@ -2,13 +2,35 @@
 
 declare(strict_types=1);
 
-// --- Base de Dados na memória ---
-$tarefas = [
-    "Estudar PHP",
-    "Beber café"
-];
+const ARQUIVO_TAREFAS = 'tarefas.json';
 
-// --- Função para mostrar as tarefas ---
+// --- Funções de Resistência ---
+function carregarTarefas(): array
+{
+    if (!file_exists(ARQUIVO_TAREFAS)) {
+        return [];
+    }
+
+    // Lê o conteúdo do arquivo como texto
+    $conteudoJson = file_get_contents(ARQUIVO_TAREFAS);
+
+    // Converte o texto JSON de volta para Array PHP
+    $lista = json_decode($conteudoJson, true);
+
+    // Se o arquivo estiver vazio, garante que devolve um array vazio
+    return is_array($lista) ? $lista : [];
+}
+
+function salvarTarefas(array $lista): void
+{
+    // Converte o Array PHP para texto JSON
+    $conteudoJson = json_encode($lista, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+    // Escreve o texto no arquivo
+    file_put_contents(ARQUIVO_TAREFAS, $conteudoJson);
+}
+
+// --- Funções de Exibição ---
 function exibirTarefas(array $lista): void
 {
     echo "\n--- AS TUAS TAREFAS ---\n";
@@ -24,7 +46,30 @@ function exibirTarefas(array $lista): void
     echo "-----------------------\n";
 }
 
-// --- Fluxo Principal (O Loop) ---
+function adicionarTarefa(array $listaAtual): array
+{
+    $novaTarefa = readline("Digite a nova tarefa: ");
+
+    // Validação simples: Não aceitar tarefa vazia
+    if ($novaTarefa === "") {
+        echo "Erro: A tarefa não pode ser vazia!\n";
+        return $listaAtual;
+    }
+
+    $listaAtual[] = $novaTarefa;
+
+    salvarTarefas($listaAtual);
+
+    echo "Tarefa salva no disco com sucesso! 💾\n";
+
+    return $listaAtual;
+}
+
+// --- Fluxo Principal ---
+
+// Antes de começar o loop, carrega o que estava salvo no disco
+$tarefas = carregarTarefas();
+
 while (true) {
     echo "\n--- MENU ---\n";
     echo "1. Listar Tarefas\n";
@@ -39,21 +84,4 @@ while (true) {
         "3" => die("Adeus! 👋\n"),
         default => print "Opção inválida!\n"
     };
-}
-
-function adicionarTarefa(array $listaAtual): array
-{
-    $novaTarefa = readline("Digite a nova tarefa: ");
-
-    // Validação simples: Não aceitar tarefa vazia
-    if ($novaTarefa === "") {
-        echo "Erro: A tarefa não pode ser vazia!\n";
-        return $listaAtual;
-    }
-
-    $listaAtual[] = $novaTarefa;
-
-    echo "Tarefa adicionada com sucesso! ✅\n";
-
-    return $listaAtual;
 }
